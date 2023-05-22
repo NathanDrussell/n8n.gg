@@ -1,0 +1,143 @@
+<script>
+  const point = (w: { min: number; max: number }, h: { min: number; max: number }, majorAxis: "x" | "y", amount: number) => {
+    const GRACE = 100;
+    const getRandomPos = () => {
+      const pos = {
+        x: Math.floor(Math.random() * (w.max - w.min)) + w.min,
+        y: Math.floor(Math.random() * (h.max - h.min)) + h.min,
+      };
+
+      pos[majorAxis] -= amount;
+
+      return pos;
+    };
+
+    const calculate = (vel: { x: number; y: number }, x: number, y: number) => {
+      const slope = vel.y / vel.x;
+      const yIntercept = y - slope * x;
+
+      return {
+        slope,
+        yIntercept,
+      };
+    };
+    const randomHue = () => Math.floor(Math.random() * 360);
+    const getVelocity = () => {
+      const r = Math.floor(Math.random() * 3);
+      return { x: 1 + r, y: 1 + r };
+    };
+
+    let { x, y } = getRandomPos();
+    let vel = getVelocity();
+    let starting = { x, y };
+    let lineDetails = calculate(vel, x, y);
+    let color = randomHue();
+
+    const update = () => {
+      x += vel.x;
+      y += vel.y;
+
+      if (y >= h.max + GRACE || x >= w.max + GRACE) {
+        // y = 0;
+        starting = getRandomPos();
+        vel = getVelocity();
+        color = randomHue();
+
+        x = starting.x;
+        y = starting.y;
+
+        lineDetails = calculate(vel, x, y);
+      }
+    };
+
+    const render = (ctx: CanvasRenderingContext2D) => {
+      const drawPoint = () => {
+        ctx.beginPath();
+        ctx.fillStyle = `hsl(${color} 75% 50%)`;
+        ctx.arc(x, y, 2, 0, Math.PI * 2);
+        ctx.fill();
+      };
+
+      const drawTrailingLine = () => {
+        ctx.beginPath();
+
+        const lineLength = 40 * (y / h.max) + 10;
+        // Calculates the previous Y
+        const deltaY = lineDetails.slope * (x - lineLength) + lineDetails.yIntercept;
+
+        const lineStartX = (deltaY - lineDetails.yIntercept) / lineDetails.slope;
+        const lineStartY = lineDetails.slope * lineStartX + lineDetails.yIntercept;
+
+        ctx.moveTo(lineStartX, lineStartY);
+        ctx.lineTo(x, y);
+        ctx.strokeStyle = `hsl(${color} 20% 20%)`;
+        ctx.stroke();
+      };
+
+      drawTrailingLine();
+      drawPoint();
+    };
+
+    return {
+      x,
+      y,
+      update,
+      render,
+    };
+  };
+
+  const windowSize = { width: window.innerWidth, height: window.innerHeight };
+  const canvas = document.getElementById("canvas") as HTMLCanvasElement;
+
+  function handleResize() {
+    windowSize.width = window.innerWidth;
+    windowSize.height = window.innerHeight;
+
+    canvas.width = windowSize.width;
+    canvas.height = windowSize.height;
+  }
+
+  window.addEventListener("resize", handleResize);
+
+  canvas.width = windowSize.width;
+  canvas.height = windowSize.height;
+
+  const animation = { current: 0 };
+  const ctx = canvas.getContext("2d")!;
+
+  const points = Array.from({ length: 120 }).map(() => {
+    const abc = window.innerWidth / window.innerHeight;
+    const majorAxis = abc > 1 ? "x" : "y";
+    const otherAxis = majorAxis === "x" ? "y" : "x";
+
+    const axes = {
+      x: { min: 0, max: windowSize.width },
+      y: { min: 0, max: windowSize.height },
+    };
+
+    axes[majorAxis].min = axes[majorAxis].max;
+
+    axes[majorAxis].max *= 1.5;
+    axes[majorAxis].min *= -0.5;
+
+    return point(axes.x, axes.y, otherAxis, axes[otherAxis].max);
+  });
+
+  const animate = () => {
+    ctx.clearRect(0, 0, windowSize.width, windowSize.height);
+    ctx.beginPath();
+    ctx.fillStyle = "#1e1e1e";
+    ctx.fillRect(0, 0, windowSize.width, windowSize.height);
+    for (const p of points) {
+      p.update();
+      p.render(ctx);
+    }
+    animation.current = requestAnimationFrame(animate);
+  };
+
+  requestAnimationFrame(animate);
+</script>
+
+<div class="fixed left-0 top-0">
+  <canvas id="canvas"></canvas>
+</div>

@@ -1,141 +1,152 @@
 <script>
-  const point = (w: { min: number; max: number }, h: { min: number; max: number }, majorAxis: "x" | "y", amount: number) => {
-    const GRACE = 100;
-    const getRandomPos = () => {
-      const pos = {
-        x: Math.floor(Math.random() * (w.max - w.min)) + w.min,
-        y: Math.floor(Math.random() * (h.max - h.min)) + h.min,
-      };
-
-      pos[majorAxis] -= amount;
-
-      return pos;
-    };
-
-    const calculate = (vel: { x: number; y: number }, x: number, y: number) => {
-      const slope = vel.y / vel.x;
-      const yIntercept = y - slope * x;
-
-      return {
-        slope,
-        yIntercept,
-      };
-    };
-    const randomHue = () => Math.floor(Math.random() * 360);
-    const getVelocity = () => {
-      const r = Math.floor(Math.random() * 3);
-      return { x: 1 + r, y: 1 + r };
-    };
-
-    let { x, y } = getRandomPos();
-    let vel = getVelocity();
-    let starting = { x, y };
-    let lineDetails = calculate(vel, x, y);
-    let color = randomHue();
-
-    const update = () => {
-      x += vel.x;
-      y += vel.y;
-
-      if (y >= h.max + GRACE || x >= w.max + GRACE) {
-        // y = 0;
-        starting = getRandomPos();
-        vel = getVelocity();
-        color = randomHue();
-
-        x = starting.x;
-        y = starting.y;
-
-        lineDetails = calculate(vel, x, y);
-      }
-    };
-
-    const render = (ctx: CanvasRenderingContext2D) => {
-      const drawPoint = () => {
-        ctx.beginPath();
-        ctx.fillStyle = `hsl(${color} 75% 50%)`;
-        ctx.arc(x, y, 2, 0, Math.PI * 2);
-        ctx.fill();
-      };
-
-      const drawTrailingLine = () => {
-        ctx.beginPath();
-
-        const lineLength = 40 * (y / h.max) + 10;
-        // Calculates the previous Y
-        const deltaY = lineDetails.slope * (x - lineLength) + lineDetails.yIntercept;
-
-        const lineStartX = (deltaY - lineDetails.yIntercept) / lineDetails.slope;
-        const lineStartY = lineDetails.slope * lineStartX + lineDetails.yIntercept;
-
-        ctx.moveTo(lineStartX, lineStartY);
-        ctx.lineTo(x, y);
-        ctx.strokeStyle = `hsl(${color} 20% 20%)`;
-        ctx.stroke();
-      };
-
-      drawTrailingLine();
-      drawPoint();
-    };
-
-    return {
-      x,
-      y,
-      update,
-      render,
-    };
-  };
-
-  const windowSize = { width: window.innerWidth, height: window.innerHeight };
-  const canvas = document.getElementById("canvas") as HTMLCanvasElement;
-
-  function handleResize() {
-    windowSize.width = window.innerWidth;
-    windowSize.height = window.innerHeight;
-
-    canvas.width = windowSize.width;
-    canvas.height = windowSize.height;
-  }
-
-  window.addEventListener("resize", handleResize);
-
-  canvas.width = windowSize.width;
-  canvas.height = windowSize.height;
-
-  const animation = { current: 0 };
+  // let canvas = document.createElement("canvas");
+  let canvas = document.getElementById("canvas") as HTMLCanvasElement;
   const ctx = canvas.getContext("2d")!;
 
-  const points = Array.from({ length: 120 }).map(() => {
-    const abc = window.innerWidth / window.innerHeight;
-    const majorAxis = abc > 1 ? "x" : "y";
-    const otherAxis = majorAxis === "x" ? "y" : "x";
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
 
-    const axes = {
-      x: { min: 0, max: windowSize.width },
-      y: { min: 0, max: windowSize.height },
+  canvas.style.background = "#1e1e1e";
+
+  const getAcceptableBounds = () => {
+    const acceptableBounds = {
+      x: {
+        min: 0 - canvas.width * factor,
+        max: canvas.width + canvas.width * factor,
+      },
+      y: {
+        min: 0 - canvas.height * factor,
+        max: canvas.height + canvas.height * factor,
+      },
     };
-
-    axes[majorAxis].min = axes[majorAxis].max;
-
-    axes[majorAxis].max *= 1.5;
-    axes[majorAxis].min *= -0.5;
-
-    return point(axes.x, axes.y, otherAxis, axes[otherAxis].max);
-  });
-
-  const animate = () => {
-    ctx.clearRect(0, 0, windowSize.width, windowSize.height);
-    ctx.beginPath();
-    ctx.fillStyle = "#1e1e1e";
-    ctx.fillRect(0, 0, windowSize.width, windowSize.height);
-    for (const p of points) {
-      p.update();
-      p.render(ctx);
-    }
-    animation.current = requestAnimationFrame(animate);
+    return {
+      acceptableBounds,
+      RESPAWN_X_RANGE: [acceptableBounds.x.min, acceptableBounds.x.max * 0.75],
+      RESPAWN_Y_RANGE: [acceptableBounds.y.min, acceptableBounds.y.max * 0.75],
+    };
   };
 
-  requestAnimationFrame(animate);
+  const factor = 0.1;
+  let { acceptableBounds, RESPAWN_X_RANGE, RESPAWN_Y_RANGE } =
+    getAcceptableBounds();
+
+  let _debounce: any = null;
+  window.addEventListener("resize", () => {
+    _debounce && clearTimeout(_debounce);
+    _debounce = setTimeout(() => {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+      ({ acceptableBounds, RESPAWN_X_RANGE, RESPAWN_Y_RANGE } =
+        getAcceptableBounds());
+    }, 100);
+  });
+
+  const NUMBER_POINTS = 50;
+  const SIZE_RANGE = [1, 2];
+  const VELOCITY_RANGE = [2, 4];
+  const SATURATION_RANGE = [40, 80];
+  const LIGHTNESS_RANGE = [50, 60];
+  const SLOPE = 0.5;
+
+  let currentFrame = 0;
+
+  const randomPointOffscreen = () => {
+    // x.min -> (x.max * 0.75)
+    // y.min -> (y.max * 0.5)
+    // either x or y must be less than 0
+    let x,
+      y,
+      max = 10,
+      count = 0;
+
+    do {
+      x = randomValueFromRange(RESPAWN_X_RANGE);
+      y = randomValueFromRange(RESPAWN_Y_RANGE);
+    } while (x > 0 && y > 0 && count++ < max);
+
+    return { x, y };
+  };
+
+  const randomPointWithinAcceptableBounds = () => {
+    const x =
+      Math.floor(
+        Math.random() * (acceptableBounds.x.max - acceptableBounds.x.min + 1)
+      ) + acceptableBounds.x.min;
+    const y =
+      Math.floor(
+        Math.random() * (acceptableBounds.y.max - acceptableBounds.y.min + 1)
+      ) + acceptableBounds.y.min;
+
+    return { x, y };
+  };
+
+  const isOutOfBounds = (point) => {
+    return (
+      point.x < acceptableBounds.x.min ||
+      point.x > acceptableBounds.x.max ||
+      point.y < acceptableBounds.y.min ||
+      point.y > acceptableBounds.y.max
+    );
+  };
+
+  const randomValueFromRange = (range: [number, number]) =>
+    Math.random() * (range[1] - range[0] + 1) + range[0];
+
+  const randomSize = () => randomValueFromRange(SIZE_RANGE);
+  const randomVelocity = () => randomValueFromRange(VELOCITY_RANGE);
+
+  const randomColor = () => {
+    const h = Math.floor(Math.random() * 360);
+    const s = randomValueFromRange(SATURATION_RANGE);
+    const l = randomValueFromRange(LIGHTNESS_RANGE);
+    return `hsl(${h}, ${s}%, ${l}%)`;
+  };
+
+  const point = () => {
+    let starting = randomPointWithinAcceptableBounds();
+    let current = { ...starting };
+    let size = randomSize();
+    let color = randomColor();
+    let velocity = randomVelocity();
+    const TRAIL_LENGTH = 10;
+
+    return {
+      render() {
+        const point = this;
+        ctx.beginPath();
+        ctx.arc(current.x, current.y, size, 0, 2 * Math.PI);
+        ctx.fillStyle = color;
+        ctx.fill();
+      },
+      update() {
+        current.x += velocity * Math.cos(SLOPE);
+        current.y += velocity * Math.sin(SLOPE);
+
+        if (isOutOfBounds(current)) {
+          starting = randomPointOffscreen();
+          current = { ...starting };
+          // velocity = 0;
+        }
+      },
+    };
+  };
+
+  const points = Array(NUMBER_POINTS)
+    .fill(0)
+    .map(() => point());
+
+  const render = () => {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.fillStyle = "#1e1e1e";
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    points.forEach((point) => {
+      point.update();
+      point.render();
+    });
+    currentFrame = window.requestAnimationFrame(render);
+  };
+
+  currentFrame = requestAnimationFrame(render);
 </script>
 
 <div class="fixed left-0 top-0">

@@ -9,7 +9,7 @@
     "preview": "astro preview",
     "astro": "astro",
     "pages:dev": "wrangler pages dev --compatibility-date=2023-05-22 --proxy 3000 -- astro dev",
-    "pages:deploy": "astro build && wrangler pages deploy --branch=main ./dist"
+    "pages:deploy": "astro build && wrangler pages deploy --branch=master ./dist"
   },
   "dependencies": {
     "@astrojs/cloudflare": "^6.6.2",

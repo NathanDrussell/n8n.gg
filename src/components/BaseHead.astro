@@ -1,7 +1,7 @@
 ---
 // Import the global.css file here so that it is included on
 // all pages through the use of the <BaseHead /> component.
-import "../styles/global.css";
+import "../styles/global.scss";
 
 export interface Props {
   title: string;
@@ -53,11 +53,21 @@ const { title, description, image = "/placeholder-social.jpg" } = Astro.props;
 <script>
   var head = document.getElementsByTagName("head")[0];
 
-  for (const weight of ["regular", "thin", "light", "bold", "fill", "duotone"]) {
+  for (const weight of [
+    "regular",
+    "thin",
+    "light",
+    "bold",
+    "fill",
+    "duotone",
+  ]) {
     var link = document.createElement("link");
     link.rel = "stylesheet";
     link.type = "text/css";
-    link.href = "https://unpkg.com/@phosphor-icons/web@2.0.3/src/" + weight + "/style.css";
+    link.href =
+      "https://unpkg.com/@phosphor-icons/web@2.0.3/src/" +
+      weight +
+      "/style.css";
     head.appendChild(link);
   }
 </script>

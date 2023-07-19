@@ -5,6 +5,73 @@ import Footer from "../components/Footer.astro";
 import Background from "../components/Background.astro";
 
 import { SITE_TITLE, SITE_DESCRIPTION } from "../consts";
+
+const work = [
+  {
+    name: "Champs Only Staking Hub and Store",
+    image: "/champs.png",
+    description:
+      "Champs Only staking hub to allow s1 holders access to their community benefits.",
+  },
+  {
+    name: "Cyber Gorillaz",
+    image: "/cg.png",
+    description:
+      "Cyber Gorillaz requested an NFT Marketplace with Raffles, Auctions and Direct Purchases using their ERC-20 token CYBER$",
+  },
+  {
+    name: "Hipster Hamsters",
+    image: "/hh.png",
+    description:
+      "Hipster Hamsters is a project focused on bringing out the art community.",
+  },
+  {
+    name: "Voxlink",
+    image: "/voxlink.png",
+    description:
+      "Voxlink was a Cold/Hot wallet tool designed to help secure your assets.",
+  },
+  // { name: "Champs Only Store", description: "Champs Only store was a token gated Shopify store" },
+];
+
+const courses = [
+  {
+    name: "Learn Blockchain, Solidity, and Full Stack Web3 Development with JavaScript - 32 hour",
+    image:
+      "https://github.com/smartcontractkit/full-blockchain-solidity-course-js/raw/main/img/blockchain1.png",
+    description: [
+      'As a full-time web2 full stack developer, I recently embarked on an exciting journey by immersing myself in a 32-hour course titled "Learn Blockchain, Solidity, and Full Stack Web3 Development with JavaScript." You might wonder why I decided to invest so much time in this course, given my existing experience in Web3. Well, the answer lies in my thirst for growth and a solid foundation.',
+      "Throughout the course, I found that most of the content acted as a refresher, reinforcing the knowledge I already had in Web3 development. However, I recognized the incredible value of this review, as it validated and solidified my understanding of the subject matter. It laid a robust groundwork on which I could build and expand my expertise in Web3 and Solidity.",
+      "While watching the video at 2x speed over several days, I took it upon myself to elevate my learning experience. I created my own starting template, simplifying and standardizing certain aspects where I felt the original content was lacking. This initiative not only deepened my understanding but also provided me with a practical resource that aligns with my preferences as a developer.",
+      "I must admit that I chose to skip the last section of the course, which focused on NFT Marketplace development. My rationale behind this decision was simple; my current full-time job centers around web2 full stack development, and my experience and preferences did not align with the beginner-oriented approach in that particular segment.",
+      "Now, with the knowledge and confidence gained from the course, I have taken the next step in my journey towards becoming one of the best Solidity and EVM blockchain developers in the Web3 realm. I've uploaded all the code, along with the code I wrote, to GitHub, making it accessible to the community and paving the way for collaborative growth.",
+      "I'm thrilled to have laid the foundation for my future in Web3, and this course was just the beginning. I can't wait to see where this path leads me, and I'm excited to continue learning, building, and contributing to the ever-evolving world of blockchain technology,",
+    ],
+    links: [
+      {
+        name: "Video",
+        icon: "ph-youtube-logo",
+        url: "https://www.youtube.com/watch?v=gyMwXuJrbJQ&",
+      },
+      {
+        name: "Code",
+        icon: "ph-github-logo",
+        url: "https://github.com/NathanDrussell/full-follow-along-fcc",
+      },
+    ],
+  },
+];
+
+const contracts = [
+  {
+    address: "0x729E599c3Ae1775F6C757AA7aCEd6e26552f66cf",
+    name: "ERC20",
+    description:
+      "I created an ERC20 Token to demonstrate my abilities. While no one may use it, it serves as proof of my skills",
+  },
+  // { address: '0x0000000000000000000000000000000000000000', name: "Small Collection", description: "" },
+  // { address: '0x0000000000000000000000000000000000000000', name: "Large Collection", description: "" },
+];
 ---
 
 <!DOCTYPE html>
@@ -15,22 +82,171 @@ import { SITE_TITLE, SITE_DESCRIPTION } from "../consts";
   <body class="w-screen flex bg-slate-50">
     <Background />
 
-    <main class="w-screen z-10 flex justify-center items-center min-h-screen text-white flex-col">
-      <div class="w-fit text-center">
-        <h1 class="text-2xl md:text-4xl">
-          Hi i'm a <br />
-          <span class="font-bold text-5xl md:text-7xl">Nathan Russell</span>
-        </h1>
-        <div class="text-2xl md:text-4xl mr-auto">and I'm a blockchain developer</div>
-        <div class="flex flex-col md:flex-row items-center gap-4 md:gap-8 justify-center mt-8">
-          <a href="//github.com/NathanDRussell" target="_blank" class="group">
-            <i class="ph-fill ph-github-logo md:text-lg text-white text-opacity-50 group-hover:text-white"></i>
-            <span class="md:text-xl font-light text-white text-opacity-50 group-hover:text-white">Github</span>
-          </a>
-          <a href="//www.linkedin.com/in/nathan-russell-n8n" target="_blank" class="group">
-            <i class="ph-fill ph-linkedin-logo md:text-lg text-white text-opacity-50 group-hover:text-white"></i>
-            <span class="md:text-xl font-light text-white text-opacity-50 group-hover:text-white">LinkedIn</span>
-          </a>
+    <main
+      class="w-screen z-10 flex justify-center items-center min-h-screen text-white flex-col"
+    >
+      <div
+        class="w-full flex justify-center items-center min-h-screen text-white flex-col"
+      >
+        <div class="w-fit text-center">
+          <h1 class="text-2xl md:text-4xl">
+            Hi i'm a <br />
+            <div class="relative">
+              <img
+                src="/nft.png"
+                class="clip-hex w-24 absolute left-0 top-1/2 -translate-y-1/2 -translate-x-full"
+                alt="nathan's avatar"
+              />
+              <span class="font-bold text-5xl md:text-7xl">Nathan Russell</span>
+            </div>
+          </h1>
+          <div class="text-">
+            <span class="text-2xl font-bold md:text-xl mr-auto"
+              >I'm a blockchain developer</span
+            >
+          </div>
+
+          <div
+            class="flex flex-col md:flex-row items-center gap-4 md:gap-8 justify-center mt-8"
+          >
+            <a
+              href="//twitter.com/NathanRNFT"
+              target="_blank"
+              class="group w-48 text-white text-opacity-50 hover:text-blue-600 transition-colors"
+            >
+              <i class="ph-fill ph-twitter-logo md:text-lg text-inherit"></i>
+              <span class="md:text-xl font-light text-inherit">Twitter</span>
+            </a>
+            <a
+              href="#work"
+              class="group w-48 text-white text-opacity-50 hover:text-blue-600 transition-colors"
+            >
+              <i class="ph-fill ph-briefcase md:text-lg text-inherit"></i>
+              <span class="md:text-xl font-light text-inherit">My work</span>
+            </a>
+            <a
+              href="#contracts"
+              class="group w-48 text-white text-opacity-50 hover:text-blue-600 transition-colors"
+            >
+              <i class="ph-fill ph-scroll md:text-lg text-inherit"></i>
+              <span class="md:text-xl font-light text-inherit">Contracts</span>
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <div class="max-w-4xl w-full flex-shrink-0 space-y-2 py-16">
+        <strong class="font-bold text-4xl">About me</strong>
+        <p>
+          I've worked with brands like Champs Only and Cyber Gorillaz to create
+          powerfull web applications. Along with experience with smaller
+          projects like Hipster Hamsters, Voxlink and more. I'm a full stack
+          developer. I'm also a blockchain developer with experience in
+          Solidity.*
+
+          <br />
+          <br />
+
+          I can take your project all the way. From helping generate ideas, to
+          designing and building the application. While also providing
+          maintenance and support. I will work hand in hand with you to build
+          the best possible product.*
+
+          <br />
+          <br />
+
+          I will provide weekly updates on the progress of your project. I will
+          also provide a staging environment for you to view the progress of
+          your project. Rapid prototyping is my specialty. I can quickly build a
+          prototype of your project to test the idea and get feedback from your
+          team. I will also provide a detailed timeline of the project and stick
+          to it.*
+
+          <br />
+          <br />
+
+          * These terms are subject to change.
+        </p>
+      </div>
+
+      <div class="max-w-4xl w-full flex-shrink-0 space-y-2">
+        <strong class="font-bold text-4xl">Courses</strong>
+        <div class="grid grid-cols-1 gap-4">
+          {
+            courses.map((course) => (
+              <div class="group flex gap-4">
+                <div class="w-80 flex-shrink-0">
+                  <img src={course.image} alt="" class="rounded mb-2 w-full" />
+                  <div class="flex space-x-2 items-center text-sm">
+                    <span>links</span>
+                    {course.links.map((link) => {
+                      return (
+                        <a
+                          href={link.url}
+                          class="bg-black/50 backdrop-blur-md p-1 rounded flex items-center gap-1 hover:bg-black/75"
+                        >
+                          <i class="ph-fill" class:list={[link.icon]} />
+                          {link.name}
+                        </a>
+                      );
+                    })}
+                  </div>
+                </div>
+                <div class="flex flex-col">
+                  <h3 class="font-bold uppercase text-xl">{course.name}</h3>
+                  {course.description[0]}
+
+                  <div class="flex justify-between w-full">
+                    <strong class="inline-flex items-center gap-2">
+                      Read more <i class="ph-fill ph-arrow-right" />{" "}
+                    </strong>
+                  </div>
+                </div>
+              </div>
+            ))
+          }
+        </div>
+      </div>
+
+      <div
+        id="contracts"
+        class="max-w-4xl w-full flex-shrink-0 space-y-2 py-16"
+      >
+        <strong class="font-bold text-4xl">Contracts</strong>
+        <div class="grid grid-cols-2 gap-4">
+          {
+            contracts.map((contract) => (
+              <div class="border rounded p-4">
+                <div class="flex justify-between items-center w-full">
+                  <strong>{contract.name}</strong>
+                  <a
+                    href={
+                      "https://sepolia.etherscan.io/address/" + contract.address
+                    }
+                  >
+                    <img src="/brand-etherscan.svg" class="w-5" alt="" />
+                  </a>
+                </div>
+
+                <p class="text-sm">{contract.description}</p>
+              </div>
+            ))
+          }
+        </div>
+      </div>
+
+      <div id="work" class="max-w-4xl w-full flex-shrink-0 space-y-2 py-16">
+        <strong class="font-bold text-4xl">Work</strong>
+        <div class="grid grid-cols-2 gap-4">
+          {
+            work.map((w) => (
+              <div class="group">
+                <img src={w.image} alt="" class="rounded mb-2 shadow" />
+                <strong>{w.name}</strong>
+                <p>{w.description}</p>
+              </div>
+            ))
+          }
         </div>
       </div>
     </main>
